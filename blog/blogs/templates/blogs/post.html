@@ -1,0 +1,24 @@
+{% extends "blogs/base.html" %}
+
+{% block content %}
+  <h2>{{ post.title }}</h2>
+  <p><strong>Дата:</strong> {{ post.date_added|date:"d.m.Y H:i" }}</p>
+  <p>{{ post.text }}</p>
+
+  <hr>
+  <h3>Записи:</h3>
+
+  <p><a href="{% url 'blogs:new_entry' post.id %}">➕ Добавить новую запись</a></p>
+
+  <ul>
+    {% for entry in entries %}
+      <li>
+        <p>{{ entry.text }}</p>
+        <small>Добавлено: {{ entry.date_added|date:"d.m.Y H:i" }}</small>
+        <p><a href="{% url 'blogs:edit_entry' entry.id %}">✏️ Редактировать</a></p>
+      </li>
+    {% empty %}
+      <li>Нет записей по этой теме.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
