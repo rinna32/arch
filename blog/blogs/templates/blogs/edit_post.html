@@ -5,6 +5,7 @@
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Сохранить изменения</button>
+    <button>Новые изменения</button>
   </form>
   <p><a href="{% url 'blogs:post' post.id %}">← Назад к посту</a></p>
 {% endblock %}
