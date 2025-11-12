@@ -2,6 +2,9 @@
   "name": "frontend",
   "private": true,
   "version": "0.0.0",
+  "homepage": ".",
+  "build": "react-scripts build",
+  "postbuild": "cp -r build/static/* ../backend/static/ && cp build/*.js ../backend/static/ && cp build/*.css ../backend/static/",
   "type": "module",
   "scripts": {
     "dev": "vite",
