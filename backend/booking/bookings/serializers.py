@@ -1,4 +1,5 @@
 # bookings/serializers.py
+from datetime import date
 from rest_framework import serializers
 from .models import Hotel, RoomType, Booking
 
@@ -10,7 +11,7 @@ class RoomTypeSerializer(serializers.ModelSerializer):
 
 
 class HotelSerializer(serializers.ModelSerializer):
-    room_types = RoomTypeSerializer(many=True, read_only=True)  # вложенные номера
+    room_types = RoomTypeSerializer(many=True, read_only=True)  
 
     class Meta:
         model = Hotel
@@ -43,7 +44,7 @@ class BookingSerializer(serializers.ModelSerializer):
         if check_out <= check_in:
             raise serializers.ValidationError("Дата выезда должна быть позже даты заезда.")
 
-        if check_in < date.today():
+        if check_in < data.today():
             raise serializers.ValidationError("Дата заезда не может быть в прошлом.")
 
         if guests > room_type.capacity:

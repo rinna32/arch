@@ -84,3 +84,12 @@ class Booking(models.Model):
     def __str__(self):
         return (f"{self.user.username} — {self.room_type} — "
                 f"{self.check_in} → {self.check_out} ({self.get_status_display()})")
+    
+
+class VerificationToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='verification_token')
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Token for {self.user.username}"    

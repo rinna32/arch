@@ -4,43 +4,46 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated  # ← ИСПРАВЛЕНО
 from django.contrib.auth.models import User
-from .models import Hotel, Booking  
+from .models import Hotel, Booking, VerificationToken
 from .serializers import HotelSerializer, BookingSerializer
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
 
 
 # === РЕГИСТРАЦИЯ ===
 class RegisterView(APIView):
-    permission_classes = [AllowAny]
-
     def post(self, request):
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
 
-        if not username or not password:
-            return Response(
-                {"error": "username и password обязательны"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         if User.objects.filter(username=username).exists():
-            return Response(
-                {"error": "Пользователь с таким именем уже существует"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Логин занят"}, status=400)
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email занят"}, status=400)
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
+        user = User.objects.create_user(username, email, password)
+        user.is_active = False
+        user.save()
+
+        # Генерируем токен
+        token = get_random_string(32)
+        VerificationToken.objects.create(user=user, token=token)
+
+        # Ссылка
+        verify_url = f"https://hotels-api-eiwu.onrender.com/api/auth/verify-email/{token}/"
+        send_mail(
+            'Подтвердите email',
+            f'Перейдите по ссылке: {verify_url}',
+            'from@example.com',
+            [email],
+            fail_silently=False,
         )
-        return Response(
-            {"message": "Пользователь успешно создан", "username": user.username},
-            status=status.HTTP_201_CREATED
-        )
+
+        return Response({"message": "Проверьте почту"}, status=201)
 
 
-# === КАТАЛОГ ОТЕЛЕЙ ===
+
 class HotelViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Hotel.objects.all().prefetch_related('room_types')
     serializer_class = HotelSerializer
