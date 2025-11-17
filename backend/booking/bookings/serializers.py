@@ -76,22 +76,22 @@ class BookingSerializer(serializers.ModelSerializer):
         return booking 
     def validate_status(self, value):
         """Разрешаем менять статус только на 'cancelled' и только в нужных случаях"""
-        instance = self.instance  # текущая бронь
+        instance = self.instance  
         request = self.context['request']
 
-        # Только владелец может отменять
+       
         if instance.user != request.user:
             raise serializers.ValidationError("Вы можете отменять только свои брони.")
 
-        # Можно отменять только до заезда
+        
         if instance.check_in <= date.today():
             raise serializers.ValidationError("Нельзя отменить бронь после заезда.")
 
-        # Можно отменять только pending или confirmed
+        
         if instance.status not in ['pending', 'confirmed']:
             raise serializers.ValidationError("Эта бронь уже отменена или завершена.")
 
-        # Разрешаем только смену на 'cancelled'
+        
         if value != 'cancelled':
             raise serializers.ValidationError("Можно изменить статус только на 'cancelled'.")
 

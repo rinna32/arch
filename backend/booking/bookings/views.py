@@ -2,7 +2,7 @@
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated  # ← ИСПРАВЛЕНО
+from rest_framework.permissions import AllowAny, IsAuthenticated  
 from django.contrib.auth.models import User
 from .models import Hotel, Booking, VerificationToken
 from .serializers import HotelSerializer, BookingSerializer
@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 
 
-# === РЕГИСТРАЦИЯ ===
+
 class RegisterView(APIView):
     def post(self, request):
         username = request.data.get('username')
@@ -57,10 +57,10 @@ class HotelViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
 
-# === БРОНИРОВАНИЕ ===
+
 class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
-    permission_classes = [IsAuthenticated]  # ← теперь работает
+    permission_classes = [IsAuthenticated]  
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user).select_related('room_type__hotel')
@@ -70,3 +70,16 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+        
+class VerifyEmailView(APIView):
+    def get(self, request, token):
+        try:
+            vt = VerificationToken.objects.get(token=token)
+            user = vt.user
+            user.is_active = True
+            user.save()
+            vt.delete()
+            return Response({"message": "Email подтверждён! Войдите."})
+        except VerificationToken.DoesNotExist:
+            return Response({"error": "Неверный токен"}, status=400)        

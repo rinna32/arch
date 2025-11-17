@@ -19,5 +19,6 @@ urlpatterns = [
     # path('load-hotels/', views.LoadHotelsView.as_view(), name='load_hotels'),
 
     # === API ===
-    path('', include(router.urls)),  # /api/auth/hotels/, /api/auth/bookings/
+    path('', include(router.urls)),
+    path('verify-email/<str:token>/', views.VerifyEmailView.as_view()),  
 ]
