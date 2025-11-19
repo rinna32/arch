@@ -11,7 +11,7 @@ SECRET_KEY = 'django-insecure-8&f4d!10tug@(3o%935&sp@u*e^)1+gpy1ngxt#iholi+6-7qx
 DEBUG = True
 ALLOWED_HOSTS = ['*']  # ← ВАЖНО! Для Render и localhost
 
-
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -22,7 +22,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework_simplejwt',
-    'drf_yasg',
+    
     'corsheaders',  # ← ДЛЯ REACT
     'bookings',
 ]
@@ -59,7 +59,14 @@ SIMPLE_JWT = {
 }
 
 ROOT_URLCONF = 'booking.urls'
+# backend/booking/settings.py
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 TEMPLATES = [
     {
